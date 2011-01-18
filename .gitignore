@@ -1,3 +1,6 @@
-/build.jardesc
 /dist
 /build
+/.settings
+/.classpath
+/.project
+/bin

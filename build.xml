@@ -28,7 +28,15 @@
 		</jar>
 	</target>
 
-	<target name="deploy" depends="dist" description="deploys to the specified server and location" >
+	<target name="deploy" depends="dist" description="deploys to the specified server and location (from PC)" >
+		<scp file="${dist}/${plugin.name}.jar" 
+			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
+			 port="${deploy.port}" 
+			 keyfile="/Users/plamoni/.ssh/id_rsa" 
+			 passphrase="" />
+	</target>
+	
+	<target name="deploy-pc" depends="dist" description="deploys to the specified server and location" >
 		<scp file="${dist}/${plugin.name}.jar" 
 			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
 			 port="${deploy.port}" 
