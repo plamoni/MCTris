@@ -25,9 +25,13 @@
 		<mkdir dir="${dist}"/>
 		<jar jarfile="${dist}/${plugin.name}.jar" basedir="${build}">
 			<fileset dir="${resources}" id="resources" />
+			<fileset dir="${src}" id="source" />
 		</jar>
 	</target>
 
+	<!-- The deploy targets are extremely specific to your environment (note that I need to have two different deploy 
+	 	 targets just for my various development machines. So you will need to handle deployment on your own. I suggest
+	 	 creating your own deploy target or changing ${dist} to your CraftBukkit/plugins directory. -->
 	<target name="deploy" depends="dist" description="deploys to the specified server and location (from PC)" >
 		<scp file="${dist}/${plugin.name}.jar" 
 			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
@@ -40,8 +44,8 @@
 		<scp file="${dist}/${plugin.name}.jar" 
 			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
 			 port="${deploy.port}" 
-			 keyfile="/Users/plamoni/.ssh/id_rsa" 
-			 passphrase="" />
+			 password="${joshua.password}" 
+			 trust="Yes" />
 	</target>
 	
 	<target name="clean"

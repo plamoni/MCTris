@@ -1,13 +1,17 @@
 package com.codefreak.mc.mctris.controller;
 
+import java.net.InetAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.codefreak.mc.mctris.MCTris;
 
 public class ClientQueueManager {
 	private ConcurrentLinkedQueue<ControllerClientHandler> queuedClients = new ConcurrentLinkedQueue<ControllerClientHandler>();
 	private ControllerClientHandler active = null;
+	private MCTris plugin;
 	
-	public ClientQueueManager() {
-		
+	public ClientQueueManager(MCTris plugin) {
+		this.plugin = plugin;
 	}
 	
 	public void clientConnect(ControllerClientHandler client) {
@@ -40,8 +44,13 @@ public class ClientQueueManager {
 	public void pressKey(ControllerClientHandler handler, int key) {
 		if(handler == this.active) {
 			System.out.println("Pressing key: " + (char)key);
+			this.plugin.onKeyPress(key);
 		} else { //not the active client!
 			//do nothing. No one cares.
 		}
+	}
+	
+	public InetAddress getInetAddressOfActivePlayer() {
+		return this.active.getInetAddress();
 	}
 }
