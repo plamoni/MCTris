@@ -12,13 +12,14 @@
 	<property name="deploy.port" value="443"/>
 	<property name="deploy.dir" value="~/craftbukkit/plugins"/>
 	<property name="plugin.name" value="MCTris" />
+	<property name="craftbukkit.local" location="c:/minecraft/plugins" />
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
 	</target>
 	
 	<target name="compile" depends="init" description="compile the source " >
-		<javac srcdir="${src}" destdir="${build}" classpath="lib/bukkit-0.0.1-SNAPSHOT.jar" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" classpath="lib/bukkit-0.0.1-SNAPSHOT.jar" />
 	</target>
 	
 	<target name="dist" depends="compile" description="generate the distribution" >
@@ -39,6 +40,11 @@
 			 keyfile="/Users/plamoni/.ssh/id_rsa" 
 			 passphrase="" />
 	</target>
+	
+	<target name="deploy-pc-local" depends="dist" description="deploys to the specified server and location" >
+		<copy file="${dist}/${plugin.name}.jar" todir="${craftbukkit.local}" />
+	</target>
+	
 	
 	<target name="deploy-pc" depends="dist" description="deploys to the specified server and location" >
 		<scp file="${dist}/${plugin.name}.jar" 
