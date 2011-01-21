@@ -3,7 +3,7 @@ package com.codefreak.mc.mctris.game;
 import java.util.ArrayList;
 
 public class Piece {
-	public static final int NUM_COLORS = 1;
+	public static final int NUM_COLORS = 4;
 	
 	private static final int ROW_OFFSET = 0;
 	private static final int COL_OFFSET = 1;
@@ -23,7 +23,7 @@ public class Piece {
 	
 	public Piece() {
 		this.templateIndex = (int)(Math.random() * PIECE_TEMPLATES.length);
-		this.color = (int)(Math.random() * (NUM_COLORS - 1)) + 1;
+		this.color = (int)(Math.random() * NUM_COLORS) + 1;
 	}
 	
 	public void rotate() {
@@ -34,7 +34,7 @@ public class Piece {
 		return (this.rotation + 1) % 4;
 	}
 	
-	private ArrayList<Cell> getAbsoluteCellsWithRotationAndOrigin(int rot, Cell org) {
+	private ArrayList<Cell> getAbsoluteCellsWithRotationAndLocation(int rot, Cell org) {
 		ArrayList<Cell> result = new ArrayList<Cell>();
 		
 		for(int i=0; i<this.blocksInPiece(); i++) {
@@ -50,12 +50,16 @@ public class Piece {
 		return result;
 	}
 	
-	public ArrayList<Cell> getAbsoluteCellsWithOrigin(Cell org) {
-		return this.getAbsoluteCellsWithRotationAndOrigin(this.rotation, org);
+	public ArrayList<Cell> getAbsoluteCellsWithLocation(Cell org) {
+		return this.getAbsoluteCellsWithRotationAndLocation(this.rotation, org);
 	}
 	
-	public ArrayList<Cell> getAbsoluteCellsWithOriginAfterRotation(Cell org) {
-		return this.getAbsoluteCellsWithRotationAndOrigin(nextRotation(), org);
+	public int getColor() {
+		return this.color;
+	}
+	
+	public ArrayList<Cell> getAbsoluteCellsWithLocationAfterRotation(Cell org) {
+		return this.getAbsoluteCellsWithRotationAndLocation(nextRotation(), org);
 	}
 	
 	private int blocksInPiece() {

@@ -1,35 +1,37 @@
 package com.codefreak.mc.mctris;
 
 import java.io.File;
-import java.net.InetAddress;
 
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.Server;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.codefreak.mc.mctris.controller.ControllerServer;
+import com.codefreak.mc.mctris.controls.MCTrisInput;
+import com.codefreak.mc.mctris.controls.MCTrisPlayerListener;
 import com.codefreak.mc.mctris.game.Game;
 
 public class MCTris extends JavaPlugin {
-	private ControllerServer cs;
 	private Server server;
 	private Game currentGame;
-	
+	private Player currentPlayer;
+	private MCTrisPlayerListener playerListener = new MCTrisPlayerListener(this);
+		
     public MCTris(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
         this.server = instance;
-        this.cs = new ControllerServer(9100, server, this);   
     }
 
     public void onEnable() {
         // Register our events
-        //PluginManager pm = getServer().getPluginManager();
-        //pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Priority.Normal, this);
         
         // EXAMPLE: Custom code, here we just output some info so we can check all is well
         PluginDescriptionFile pdfFile = this.getDescription();
@@ -41,31 +43,51 @@ public class MCTris extends JavaPlugin {
         System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " has been disabled!" );
     }
     
-    //Would be nice if Minecraft sent all keypresses. But it doesn't. So here's to hoping it might someday.
-    public void onKeyPress(int key) {
-    	if(key == 'n') {
-    		Player p = this.getActivePlayer();
-			Block b = p.getWorld().getBlockAt(45, 90, 11);
-			
-			System.out.println("TOGGLE");
-			if(b.getType() == Material.AIR)
-				b.setType(Material.COBBLESTONE);
-			else
-				b.setType(Material.AIR);
-    	}
-    	//this.currentGame.keyPress(key);
+    public Player getCurrentPlayer() {
+    	return this.currentPlayer;
     }
     
+    public void setCurrentPlayer(Player player) {
+    	this.currentPlayer = player;
+    }
     
-    public Player getActivePlayer() {
-    	InetAddress address = this.cs.getInetAddressOfActivePlayer();
+    public void gameInput(MCTrisInput value) {
+    	this.currentGame.keyPress(value);
+    }
+    
+    public void newGame(Player player) {
+    	if(this.currentGame != null) this.currentGame.endCurrentGame();
     	
-    	for(Player p : this.server.getOnlinePlayers()) {
-    		if(p.getAddress().equals(address)) {
-    			return p;
-    		}
-    	}
+    	this.currentPlayer = player;
+    	this.currentGame = new Game(this.currentPlayer.getWorld(), this);
+		this.portCurPlayerToViewingArea();
+    }
+    
+    public void endGame() {
+    	this.currentGame.endCurrentGame();
+		this.portCurPlayerToEndGame();
+    	this.currentPlayer = null;
+    }
+    
+    public void loseGame() {
+    	this.currentGame.endCurrentGame();
+		this.portCurPlayerToLose();
+    	this.currentPlayer = null;
+    }
+    
+    public void portCurPlayerToViewingArea() {
+    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 66f, -2.5f, 0f, -26.25f);
+    	this.currentPlayer.teleportTo(destination);
+    }
+    
+    public void portCurPlayerToEndGame() {
+    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 70f, -3.5f, 0f, -37f);
+    	this.currentPlayer.teleportTo(destination);
     	
-    	return null;
+    }
+    
+    public void portCurPlayerToLose() {
+    	Location destination = new Location(this.currentPlayer.getWorld(), 40.5f, 65f, -14f, 90f, 0f);
+    	this.currentPlayer.teleportTo(destination);  
     }
 }
