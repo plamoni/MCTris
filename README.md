@@ -10,12 +10,12 @@ The big world-specific information you should look for involves locations:
 
 * portCurPlayerToViewingArea(), portCurPlayerToEndGame(), and portCurPlayerToLose() contain locations to port the user to in various circumstances. These should be altered.
 
-Game.java:
+####Game.java:
 
 * GAME_LOC_X, GAME_LOC_Y, and GAME_LOC_Z specify the block used for the bottom left-hand corner of the game board. Currently, the game board renders along the X-Y plane and should be viewed from a Z location < GAME_LOC_Z (in order to not have the controls be backwards!).
 * TICK_LENGTH represents the number of milliseconds between "ticks" (which move pieces down.
 
-MCTrisPlayerListener.java:
+####MCTrisPlayerListener.java:
 
 * ALLOW_PREEMPT will likely be set to "true". This allows a player to jump into the game when someone else is playing. This should be set to false for any "production" servers in order to prevent people form having their games ruined. It might also result in undesireable side-effects to have someone pre-empt someone else.
 * There is a "//REMOVE THESE" area. These should be removed for any public servers, as they will allow players to use the "/set" command to modify blocks at will. The /loc command is very useful in identifying locations for the placement of the board and teleport spots.
