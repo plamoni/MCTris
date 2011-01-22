@@ -1,25 +1,38 @@
-<project name="MCTris" default="dist" basedir=".">
+<project name="MCTris" default="dist" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+	<path id="maven-ant-tasks.classpath" path="lib/maven-ant-tasks-2.1.1.jar" />
+  	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+           uri="antlib:org.apache.maven.artifact.ant"
+           classpathref="maven-ant-tasks.classpath" />
+	
 	<description>
-	CraftBukkit Plugin
+		CraftBukkit Plugin
 	</description>
-	<!-- set global properties for this build -->
+	
+	<!-- CraftBukkit Build (remove if not needed) -->
+	<property name="bukkit.pom" location="../Bukkit/pom.xml" />
+	<property name="craftbukkit.pom" location="../CraftBukkit/pom.xml" />
+	<property name="bukkit.target" location="../Bukkit/target" />
+	<property name="craftbukkit.target" location="../CraftBukkit/target" />
+	<property name="craftbukkit.jar" value="craftbukkit-0.0.1-SNAPSHOT.jar" />
+	
+	
+	<!-- MCTris Build -->
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
 	<property name="resources" location="resources"/>
-	<property name="deploy.user" value="plamoni" />
-	<property name="deploy.host" value="hardac.code-freak.com" />
-	<property name="deploy.port" value="443"/>
-	<property name="deploy.dir" value="~/craftbukkit/plugins"/>
 	<property name="plugin.name" value="MCTris" />
-	<property name="craftbukkit.local" location="c:/minecraft/plugins" />
-	
+	<property name="craftbukkit.local" location="c:/minecraft" />	
+	<property name="bukkit.jar" value="bukkit-0.0.1-SNAPSHOT.jar" />
+	<property name="mctris.lib" location="lib" />
+		
 	<target name="init">
 		<mkdir dir="${build}"/>
 	</target>
 	
-	<target name="compile" depends="init" description="compile the source " >
-		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" classpath="lib/bukkit-0.0.1-SNAPSHOT.jar" />
+	<!-- You will want to remove the depends for the build-deploy-craftbukkit task if you're not building craftbukkit yourself -->
+	<target name="compile" depends="init,build-deploy-craftbukkit" description="compile the source " >
+		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" classpath="${mctris.lib}/${bukkit.jar}" />
 	</target>
 	
 	<target name="dist" depends="compile" description="generate the distribution" >
@@ -30,29 +43,29 @@
 		</jar>
 	</target>
 
-	<!-- The deploy targets are extremely specific to your environment (note that I need to have two different deploy 
-	 	 targets just for my various development machines. So you will need to handle deployment on your own. I suggest
-	 	 creating your own deploy target or changing ${dist} to your CraftBukkit/plugins directory. -->
-	<target name="deploy" depends="dist" description="deploys to the specified server and location (from PC)" >
-		<scp file="${dist}/${plugin.name}.jar" 
-			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
-			 port="${deploy.port}" 
-			 keyfile="/Users/plamoni/.ssh/id_rsa" 
-			 passphrase="" />
+	<!-- The deploy target(s) is/are extremely specific to your environment. So you will need to handle deployment on your own. 
+		 I suggest creating your own deploy target or changing ${dist} to your CraftBukkit/plugins directory. -->
+	<target name="deploy-local" depends="dist" description="deploys to the specified server and location" >
+		<copy file="${dist}/${plugin.name}.jar" todir="${craftbukkit.local}/plugins" />
+		<copy file="${craftbukkit.target}/${craftbukkit.jar}" todir="${craftbukkit.local}" />
 	</target>
 	
-	<target name="deploy-pc-local" depends="dist" description="deploys to the specified server and location" >
-		<copy file="${dist}/${plugin.name}.jar" todir="${craftbukkit.local}" />
-	</target>
-	
-	
-	<target name="deploy-pc" depends="dist" description="deploys to the specified server and location" >
-		<scp file="${dist}/${plugin.name}.jar" 
-			 todir="${deploy.user}@${deploy.host}:${deploy.dir}" 
-			 port="${deploy.port}" 
-			 password="${joshua.password}" 
-			 trust="Yes" />
-	</target>
+    <target name="build-deploy-craftbukkit" description="builds and deploys craftbukkit using maven">
+    	<artifact:mvn pom="${bukkit.pom}">
+    	    <arg value="clean"/>
+    	</artifact:mvn>
+    	<artifact:mvn pom="${bukkit.pom}">
+    	    <arg value="install"/>
+    	</artifact:mvn>
+    	<artifact:mvn pom="${craftbukkit.pom}">
+    	    <arg value="clean"/>
+    	</artifact:mvn>
+    	<artifact:mvn pom="${craftbukkit.pom}">
+    	    <arg value="package"/>
+    	</artifact:mvn>
+		<copy file="${bukkit.target}/${bukkit.jar}" todir="${mctris.lib}" />
+    </target>
+
 	
 	<target name="clean"
 		description="clean up" >
