@@ -81,7 +81,7 @@ public class MCTris extends JavaPlugin {
     }
     
     public void portCurPlayerToEndGame() {
-    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 70f, -3.5f, 0f, -37f);
+    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 68f, -10f, 0f, -16.5f);
     	this.currentPlayer.teleportTo(destination);
     	
     }

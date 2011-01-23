@@ -2,6 +2,7 @@ package com.codefreak.mc.mctris.game;
 
 import java.util.ArrayList;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -123,6 +124,7 @@ public class Game implements Runnable {
 				int value = board.getColorOfCell(cell);
 				Block b = this.getBlockAt(cell);
 				b.setType(getMaterialForColor(value));
+				b.setData(getDataForColor(value));
 			}
 		}
 		
@@ -137,19 +139,20 @@ public class Game implements Runnable {
 		Material containerMaterial = Material.OBSIDIAN;
 		
 		//draw base
-		for(int i=0; i<Board.WIDTH+2; i++) {
-			this.getBlockAt(new Cell(-1,i-1)).setType(containerMaterial);
+		for(int i=-1; i<Board.WIDTH+1; i++) {
+			this.getBlockAt(new Cell(-1,i)).setType(containerMaterial);
 		}
 			
 		//draw left tower
-		for(int i=0; i<Board.VISIBLE_HEIGHT+1; i++) {
+		for(int i=0; i<Board.VISIBLE_HEIGHT; i++) {
 			this.getBlockAt(new Cell(i,-1)).setType(containerMaterial);
 		}
 		
 		//draw right tower
-		for(int i=0; i<Board.VISIBLE_HEIGHT+1; i++) {
+		for(int i=0; i<Board.VISIBLE_HEIGHT; i++) {
 			this.getBlockAt(new Cell(i,Board.WIDTH)).setType(containerMaterial);
 		}
+	
 	}
 	
 	//clears the area used by the game board
@@ -177,11 +180,28 @@ public class Game implements Runnable {
 		
 		switch(value) {
 			case 0: result = Material.AIR; break;
-			case 1: result = Material.GOLD_BLOCK; break;
-			case 2: result = Material.DIAMOND_BLOCK; break;
-			case 3: result = Material.LAPIS_BLOCK; break;
-			case 4: result = Material.SNOW_BLOCK; break;
+			case 1: 
+			case 2: 
+			case 3: 
+			case 4: 
+			case 5: result = Material.WOOL; break;
 			default: result = Material.AIR;
+		}
+		
+		return result;
+	}
+	
+	private byte getDataForColor(int value) {
+		byte result;
+		
+		switch(value) {
+			case 0: result = 0; break;
+			case 1: result = DyeColor.BLUE.getData(); break;
+			case 2: result = DyeColor.GREEN.getData(); break;
+			case 3: result = DyeColor.RED.getData(); break;
+			case 4: result = DyeColor.YELLOW.getData(); break;
+			case 5: result = DyeColor.ORANGE.getData(); break;
+			default: result = 0;
 		}
 		
 		return result;
@@ -195,6 +215,7 @@ public class Game implements Runnable {
 		for(Cell cell : cells) {
 			if(this.board.cellIsVisible(cell)) {
 				this.getBlockAt(cell).setType(this.getMaterialForColor(this.curPiece.getColor()));
+				this.getBlockAt(cell).setData(this.getDataForColor(this.curPiece.getColor()));
 			}
 		}
 	}
