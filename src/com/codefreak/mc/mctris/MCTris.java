@@ -1,6 +1,8 @@
 package com.codefreak.mc.mctris;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -21,13 +23,16 @@ public class MCTris extends JavaPlugin {
 	private Game currentGame;
 	private Player currentPlayer;
 	private MCTrisPlayerListener playerListener = new MCTrisPlayerListener(this);
+	
+	public static Logger logger = MCTrisLogManager.logger;
 		
     public MCTris(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
+        MCTrisLogManager.init();
         this.server = instance;
     }
 
-    public void onEnable() {
+    public void onEnable() {    	
         // Register our events
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Priority.Normal, this);
@@ -35,12 +40,12 @@ public class MCTris extends JavaPlugin {
         
         // EXAMPLE: Custom code, here we just output some info so we can check all is well
         PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
+        logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
         
     }
     public void onDisable() {
     	PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " has been disabled!" );
+    	logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been disabled!" );
     }
     
     public Player getCurrentPlayer() {

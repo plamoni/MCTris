@@ -22,7 +22,7 @@
 	<property name="dist" location="dist"/>
 	<property name="resources" location="resources"/>
 	<property name="plugin.name" value="MCTris" />
-	<property name="craftbukkit.local" location="c:/minecraft" />	
+	<property name="minecraft.local" location="/Users/plamoni/craftbukkit" />	
 	<property name="bukkit.jar" value="bukkit-0.0.1-SNAPSHOT.jar" />
 	<property name="mctris.lib" location="lib" />
 		
@@ -31,7 +31,7 @@
 	</target>
 	
 	<!-- You will want to remove the depends for the build-deploy-craftbukkit task if you're not building craftbukkit yourself -->
-	<target name="compile" depends="init,build-deploy-craftbukkit" description="compile the source " >
+	<target name="compile" depends="init" description="compile the source " >
 		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" classpath="${mctris.lib}/${bukkit.jar}" />
 	</target>
 	
@@ -46,8 +46,8 @@
 	<!-- The deploy target(s) is/are extremely specific to your environment. So you will need to handle deployment on your own. 
 		 I suggest creating your own deploy target or changing ${dist} to your CraftBukkit/plugins directory. -->
 	<target name="deploy-local" depends="dist" description="deploys to the specified server and location" >
-		<copy file="${dist}/${plugin.name}.jar" todir="${craftbukkit.local}/plugins" />
-		<copy file="${craftbukkit.target}/${craftbukkit.jar}" todir="${craftbukkit.local}" />
+		<copy file="${dist}/${plugin.name}.jar" todir="${minecraft.local}/plugins" />
+		<copy file="${craftbukkit.target}/${craftbukkit.jar}" todir="${minecraft.local}" />
 	</target>
 	
     <target name="build-deploy-craftbukkit" description="builds and deploys craftbukkit using maven">

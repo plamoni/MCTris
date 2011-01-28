@@ -3,6 +3,8 @@ package com.codefreak.mc.mctris.game;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import com.codefreak.mc.mctris.MCTrisLogManager;
+
 public class Board {
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 22;
@@ -34,7 +36,7 @@ public class Board {
 	//clears out filled rows and returns an arraylist containing the row numbers cleared
 	public ArrayList<Integer> checkAndClearRows() {
 		
-		System.out.println("Checking rows");
+		MCTrisLogManager.logger.fine("Checking rows");
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		
 		for(int i=0; i<this.board.size(); i++) {
