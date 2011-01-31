@@ -13,7 +13,6 @@ import com.codefreak.mc.mctris.MCTris;
 
 public class MCTrisPlayerListener extends PlayerListener {
 	private MCTris plugin;
-		
 
 		
 	//Allow a player to pre-empt another player to play the game. Useful for testing.
@@ -21,7 +20,6 @@ public class MCTrisPlayerListener extends PlayerListener {
 	
 	
 	public MCTrisPlayerListener(MCTris plugin) {
-		// TODO Auto-generated constructor stub
 		this.plugin = plugin;
 	}
 	
@@ -97,7 +95,7 @@ public class MCTrisPlayerListener extends PlayerListener {
 				}
 			}
 			
-			this.plugin.portCurPlayerToViewingArea();
+			event.getPlayer().teleportTo(this.plugin.getPlayLocation());
 		}
 	}
 }

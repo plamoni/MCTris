@@ -22,17 +22,25 @@
 	<property name="dist" location="dist"/>
 	<property name="resources" location="resources"/>
 	<property name="plugin.name" value="MCTris" />
-	<property name="minecraft.local" location="/Users/plamoni/craftbukkit" />	
+	<property name="minecraft.local" location="c:/minecraft" />	
 	<property name="bukkit.jar" value="bukkit-0.0.1-SNAPSHOT.jar" />
 	<property name="mctris.lib" location="lib" />
-		
+	
+	<path id="mctris.classpath">
+	  <fileset dir="${mctris.lib}">
+	    <include name="*.jar"/>
+	  </fileset>
+	</path>
+	
 	<target name="init">
 		<mkdir dir="${build}"/>
 	</target>
 	
 	<!-- You will want to remove the depends for the build-deploy-craftbukkit task if you're not building craftbukkit yourself -->
 	<target name="compile" depends="init" description="compile the source " >
-		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" classpath="${mctris.lib}/${bukkit.jar}" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="mctris.classpath" />
+		</javac>
 	</target>
 	
 	<target name="dist" depends="compile" description="generate the distribution" >
