@@ -13,15 +13,13 @@ import com.codefreak.mc.mctris.MCTris;
 
 public class MCTrisPlayerListener extends PlayerListener {
 	private MCTris plugin;
-		
 
 		
 	//Allow a player to pre-empt another player to play the game. Useful for testing.
-	private static boolean ALLOW_PREEMPT = true;
+	private static boolean ALLOW_PREEMPT = false;
 	
 	
 	public MCTrisPlayerListener(MCTris plugin) {
-		// TODO Auto-generated constructor stub
 		this.plugin = plugin;
 	}
 	
@@ -30,13 +28,13 @@ public class MCTrisPlayerListener extends PlayerListener {
 		super.onPlayerCommand(event);
 		
 		Player player = event.getPlayer();
-		if(event.getMessage().startsWith("/play")) {
+		if(event.getMessage().trim().equals("/play")) {
 			if(ALLOW_PREEMPT || this.plugin.getCurrentPlayer() == null) {
 				this.plugin.newGame(event.getPlayer());
 			} else {
 				player.sendMessage("Sorry, another player is playing. Try again later!");
 			}
-		} else if(event.getMessage().startsWith("/endgame")) {
+		} else if(event.getMessage().trim().equals("/endgame")) {
 			if(this.plugin.getCurrentPlayer().equals(player)) {
 				this.plugin.endGame();
 			} else {
@@ -97,7 +95,7 @@ public class MCTrisPlayerListener extends PlayerListener {
 				}
 			}
 			
-			this.plugin.portCurPlayerToViewingArea();
+			event.getPlayer().teleportTo(this.plugin.getPlayLocation());
 		}
 	}
 }

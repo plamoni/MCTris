@@ -3,13 +3,14 @@ package com.codefreak.mc.mctris.game;
 import java.util.ArrayList;
 
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 import com.codefreak.mc.mctris.MCTris;
 import com.codefreak.mc.mctris.controls.MCTrisInput;
+import com.codefreak.mc.mctris.settings.Axis;
 
 
 public class Game implements Runnable {
@@ -17,22 +18,23 @@ public class Game implements Runnable {
 	private Piece curPiece = new Piece();
 	private Cell curPieceLocation = new Cell(Board.PIECE_SPAWN_ROW, Board.PIECE_SPAWN_COL);
 	private World gameWorld;
-	
-	//defines the bottom left-hand corner block of the game board.
-	// the game board is 12 by 19.
-	private static final int GAME_LOC_X = 62;
-	private static final int GAME_LOC_Y = 77;
-	private static final int GAME_LOC_Z = 15;
-	
+	private Location boardLocation;
+	private Axis upAxis;
+	private Axis rightAxis;
+		
 	private static final int TICK_LENGTH = 1000;
 	
 	private boolean gameOver = false;
 	private MCTris plugin;
 	
 	
-	public Game(World gameWorld, MCTris plugin) {
+	public Game(World gameWorld, MCTris plugin, Location boardLocation, Axis up, Axis right) {
 		this.gameWorld = gameWorld;
 		this.plugin = plugin;
+		this.boardLocation = plugin.getSettings().locGameBoard();
+		this.upAxis = up;
+		this.rightAxis = right;
+		
 		(new Thread(this)).start();
 	}
 	
@@ -45,6 +47,8 @@ public class Game implements Runnable {
 				this.tick();
 				
 				this.drawBoard();
+				
+				this.plugin.checkIfPlayerOnline();
 				Thread.sleep(TICK_LENGTH);
 			}
 			
@@ -156,11 +160,19 @@ public class Game implements Runnable {
 	}
 	
 	//clears the area used by the game board
+	//TODO: Fix for axis modification
 	public void clearArea() {
-		for(int z=GAME_LOC_Z-1; z<GAME_LOC_Z+2; z++) {
-			for(int x=GAME_LOC_X-2; x<GAME_LOC_X+Board.WIDTH+2; x++) {
-				for(int y=GAME_LOC_Y-2; y<GAME_LOC_Y+Board.VISIBLE_HEIGHT+2; y++) {
-					this.gameWorld.getBlockAt(x,y,z).setType(Material.AIR);
+		Axis frontAxis = Axis.otherAxis(this.upAxis, this.rightAxis);
+		
+		for(int front_offset=-1; front_offset<=1; front_offset++) {
+			for(int right_offset=-2; right_offset<Board.WIDTH+2; right_offset++) {
+				for(int up_offset=-2; up_offset<Board.VISIBLE_HEIGHT+2; up_offset++) {
+					Location tmp_loc = this.boardLocation;
+					tmp_loc = frontAxis.offset(tmp_loc, front_offset);
+					tmp_loc = this.rightAxis.offset(tmp_loc, right_offset);
+					tmp_loc = this.upAxis.offset(tmp_loc, up_offset);
+					
+					this.gameWorld.getBlockAt(tmp_loc.getBlockX(), tmp_loc.getBlockY(), tmp_loc.getBlockZ()).setType(Material.AIR);
 				}
 			}
 		}
@@ -171,8 +183,14 @@ public class Game implements Runnable {
 		this.drawBoard();
 	}
 	
+	//TODO: Fix for axis modification
 	private Block getBlockAt(Cell cell) {
-		return this.gameWorld.getBlockAt(GAME_LOC_X + cell.col + 1, GAME_LOC_Y + cell.row + 1, GAME_LOC_Z);
+		Location loc = this.boardLocation;
+		
+		loc = this.rightAxis.offset(loc, cell.col + 1);
+		loc = this.upAxis.offset(loc, cell.row + 1);
+		
+		return this.gameWorld.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 	
 	private Material getMaterialForColor(int value) {

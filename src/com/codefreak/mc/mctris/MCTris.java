@@ -1,7 +1,6 @@
 package com.codefreak.mc.mctris;
 
 import java.io.File;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
@@ -17,11 +16,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.codefreak.mc.mctris.controls.MCTrisInput;
 import com.codefreak.mc.mctris.controls.MCTrisPlayerListener;
 import com.codefreak.mc.mctris.game.Game;
+import com.codefreak.mc.mctris.settings.MCTrisSettings;
 
 public class MCTris extends JavaPlugin {
 	private Server server;
 	private Game currentGame;
 	private Player currentPlayer;
+	private MCTrisSettings settings = new MCTrisSettings();
 	private MCTrisPlayerListener playerListener = new MCTrisPlayerListener(this);
 	
 	public static Logger logger = MCTrisLogManager.logger;
@@ -31,8 +32,12 @@ public class MCTris extends JavaPlugin {
         MCTrisLogManager.init();
         this.server = instance;
     }
+    
+    public MCTrisSettings getSettings() {
+    	return this.settings;
+    }
 
-    public void onEnable() {    	
+    public void onEnable() {
         // Register our events
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Priority.Normal, this);
@@ -61,38 +66,40 @@ public class MCTris extends JavaPlugin {
     }
     
     public void newGame(Player player) {
+    	this.server.broadcastMessage(this.currentPlayer.getDisplayName() + " has begun a game of MCTris! Good luck!");
     	if(this.currentGame != null) this.currentGame.endCurrentGame();
     	
     	this.currentPlayer = player;
-    	this.currentGame = new Game(this.currentPlayer.getWorld(), this);
-		this.portCurPlayerToViewingArea();
+
+    	//REMOVE THIS:
+    	this.settings.generateBoard(player.getWorld(), player.getLocation());
+    	//END REMOVE
+    	
+    	this.currentGame = new Game(this.currentPlayer.getWorld(), this, settings.locGameBoard(), settings.UpDir(), settings.RightDir());
+    	this.currentPlayer.teleportTo(settings.locPlay());
     }
     
     public void endGame() {
+    	this.server.broadcastMessage(this.currentPlayer.getDisplayName() + " has quit MCTris!");
     	this.currentGame.endCurrentGame();
-		this.portCurPlayerToEndGame();
+    	this.currentPlayer.teleportTo(settings.locLeaveGame());
     	this.currentPlayer = null;
     }
     
     public void loseGame() {
+    	this.server.broadcastMessage(this.currentPlayer.getDisplayName() + " has lost at MCTris!");
     	this.currentGame.endCurrentGame();
-		this.portCurPlayerToLose();
+    	this.currentPlayer.teleportTo(settings.locLoseGame());
     	this.currentPlayer = null;
     }
     
-    public void portCurPlayerToViewingArea() {
-    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 66f, -2.5f, 0f, -26.25f);
-    	this.currentPlayer.teleportTo(destination);
+    public Location getPlayLocation() {
+    	return settings.locPlay();
     }
     
-    public void portCurPlayerToEndGame() {
-    	Location destination = new Location(this.currentPlayer.getWorld(), 68.5f, 68f, -10f, 0f, -16.5f);
-    	this.currentPlayer.teleportTo(destination);
-    	
-    }
-    
-    public void portCurPlayerToLose() {
-    	Location destination = new Location(this.currentPlayer.getWorld(), 40.5f, 65f, -14f, 90f, 0f);
-    	this.currentPlayer.teleportTo(destination);  
+    public void checkIfPlayerOnline() {
+    	if(!this.currentPlayer.isOnline()) {
+    		this.endGame();
+    	}
     }
 }
